@@ -1,0 +1,73 @@
+# 👴 Senior Connect: Non-Invasive Elderly Monitoring System
+
+> **A smart, privacy-first safety net for elderly living alone.**
+
+## 📖 About The Project
+**Senior Connect** is a distributed IoT system designed to protect elderly residents living alone in Singapore. Unlike traditional monitoring systems that rely on intrusive CCTV cameras, Senior Connect uses a "Sensor Fusion" approach to detect emergencies (like falls or unconsciousness) without compromising the user's dignity or privacy.
+
+Our system passively monitors critical zones (Bathroom, Living Room, Bedroom) and uses logic-based algorithms to distinguish between normal daily routines and potential emergencies.
+
+### 🎯 Key Goals
+* **Zero Cameras in Private Zones:** Uses environmental data (Humidity, Radar, Motion) instead of video.
+* **Real-Time Safety:** Instantly alerts caregivers via Email upon detecting falls or abnormal inactivity.
+* **Privacy First:** All processing is done locally on Raspberry Pi "Edge Nodes."
+
+---
+
+## ⚙️ System Architecture
+The project is built on a **Distributed IoT Network** topology. Each room functions as an independent "Edge Node" that processes raw sensor data locally and transmits status updates to a Central Controller via **MQTT**.
+
+![System Architecture Diagram](path/to/your/architecture_image.png)
+*(Replace this with your architecture diagram image)*
+
+### The "Sensor Suite"
+* **Zone 1: Bathroom (The "Steam Logic")**
+    * **Hardware:** DHT22 Humidity Sensor + PIR Motion Sensor + Proximity Sensor.
+    * **Logic:** Detects active showering by tracking steam levels (>90% Humidity).
+    * **Safety:** Triggers a **CRITICAL ALERT** if high humidity is detected but no motion occurs for >60 seconds (Potential unconscious fall).
+
+* **Zone 2: Living Room (Activity Monitoring)**
+    * **Hardware:** mmWave Radar + PIR Sensor + Pi Camera (Entrance only).
+    * **Logic:** Monitors "Human Presence" even when the user is sitting still.
+    * **Safety:** Triggers a wellness check if **No Motion** is detected for 2 hours while the user is home.
+
+* **Zone 3: Bedroom (Vitals Tracking)**
+    * **Hardware:** mmWave Radar (LD2410).
+    * **Logic:** Tracks "In Bed" vs. "Out of Bed" status.
+    * **Safety:** Monitors Heart Rate and Breathing Rate through blankets to detect health deterioration during sleep.
+
+---
+
+## 🛠️ Tech Stack & Hardware
+
+### Hardware
+* **Controller:** 4x Raspberry Pi 4 Model B (1 Main Controller + 3 Sensor Nodes)
+* **Sensors:**
+    * **mmWave Radar:** LD2410 (Human Presence & Vitals)
+    * **Environmental:** DHT22 (Humidity/Temp)
+    * **Motion:** HC-SR501 PIR
+    * **Context:** Magnetic Door Sensors (Proximity)
+    * **Visual:** Pi Camera Module (Main Door Entrance only)
+
+### Software & Protocols
+* **Language:** Python 3
+* **Communication:** MQTT (Mosquitto Broker) over Wi-Fi
+* **Data Logging:** `openpyxl` (Excel), automated Git commits for data backup.
+* **Notifications:** SMTP (Gmail API) for real-time alerts.
+* **Automation:** `systemd` for persistent background services.
+
+---
+
+## 🚀 Key Features
+
+### 1. "Steam Logic" Fall Detection
+We solved the problem of monitoring wet bathrooms without cameras. By correlating the **Proximity Sensor** (Entry) with **Humidity Spikes** (Shower ON), the system knows when a fall is most likely to happen and tightens its safety thresholds accordingly.
+
+### 2. Spam-Filtered Alerts
+The Central Controller includes a "Cool-Down" logic to prevent alert fatigue. If a fall is detected, it suppresses duplicate emails for 60 seconds while continuing to log the event.
+
+### 3. Automated Data Dashboard
+Sensor logs are automatically written to a master Excel file (`SeniorConnect_MasterLog.xlsx`). A custom Python script pushes this file to a private GitHub repository every minute, ensuring the Workflow Team always has access to the latest health data without manual file transfers.
+
+---
+
